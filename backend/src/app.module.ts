@@ -3,6 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { RegisterController } from './controllers/register.controller';
+import { UserCredentialsRepository } from './repositories/user-credentials.repository';
+import { UserProfileRepository } from './repositories/user-profile.repository';
+import { RegisterService } from './services/register.service';
+import { UserProfile } from './repositories/entity/user-profile.entity';
+import { UserCredentials } from './repositories/entity/user-credentials.entity';
 
 @Module({
   imports: [
@@ -19,13 +25,14 @@ import { AppService } from './app.service';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         entities: ['dist/**/*.entity.js'],
-        synchronize: false,
+        synchronize: true,
         logging: configService.get('NODE_ENV') === 'development',
       }),
       inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([UserProfile, UserCredentials]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, RegisterController],
+  providers: [AppService, RegisterService, UserProfileRepository, UserCredentialsRepository],
 })
 export class AppModule {}
